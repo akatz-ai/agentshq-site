@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentsHQ — Your AI agents. Your infrastructure. Your rules.</title>
+<meta name="description" content="Deploy a private fleet of AI agents on your own server. Discord, Slack, or WhatsApp. Claude-powered. Fully owned.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-void: #06070a;
+  --bg-primary: #0a0c11;
+  --bg-surface: #10131a;
+  --bg-elevated: #161a24;
+  --bg-hover: #1c2130;
+
+  --border-subtle: rgba(255,255,255,0.05);
+  --border-default: rgba(255,255,255,0.08);
+
+  --text-primary: #eaecf2;
+  --text-secondary: #8b8fa6;
+  --text-muted: #4e5270;
+
+  --green: #63d297;
+  --green-dim: rgba(99,210,151,0.12);
+  --green-glow: rgba(99,210,151,0.06);
+  --blue: #5b9cf5;
+  --blue-dim: rgba(91,156,245,0.12);
+  --amber: #e5a84b;
+  --amber-dim: rgba(229,168,75,0.12);
+  --purple: #a78bfa;
+  --purple-dim: rgba(167,139,250,0.12);
+  --red: #e55b5b;
+
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-sans: 'DM Sans', sans-serif;
+  --font-serif: 'Instrument Serif', serif;
+}
+
+html { font-size: 16px; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-void);
+  color: var(--text-primary);
+  overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════
+   GLOBAL ATMOSPHERE
+   ═══════════════════════════════════════════ */
+.atmosphere {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+}
+.atmosphere::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 100% 70% at 30% 0%, rgba(99,210,151,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 60% at 80% 20%, rgba(91,156,245,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(167,139,250,0.03) 0%, transparent 50%);
+}
+.atmosphere::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.015) 3px, rgba(0,0,0,0.015) 6px);
+}
+
+/* Grid overlay */
+.grid-bg {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse 70% 50% at 50% 30%, black 0%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 50% at 50% 30%, black 0%, transparent 70%);
+}
+
+/* ═══════════════════════════════════════════
+   NAV
+   ═══════════════════════════════════════════ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 50;
+  padding: 0 48px;
+  height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(6,7,10,0.7);
+  backdrop-filter: blur(20px) saturate(1.2);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.nav-logo { display: flex; align-items: center; gap: 10px; }
+.nav-logo-icon {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.nav-logo-icon img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+}
+.nav-logo-text { font-family: var(--font-mono); font-size: 16px; font-weight: 600; letter-spacing: -0.5px; }
+.nav-links { display: flex; align-items: center; gap: 32px; }
+.nav-links a {
+  font-size: 13.5px; color: var(--text-secondary);
+  text-decoration: none; transition: color 0.15s;
+}
+.nav-links a:hover { color: var(--text-primary); }
+.nav-cta {
+  padding: 8px 20px; border-radius: 6px;
+  background: var(--green); color: var(--bg-void) !important;
+  font-weight: 600; font-size: 13px !important;
+  box-shadow: 0 0 20px rgba(99,210,151,0.15);
+  transition: all 0.15s !important;
+}
+.nav-cta:hover { background: #7adcab !important; box-shadow: 0 0 30px rgba(99,210,151,0.25); transform: translateY(-1px); }
+
+@media (max-width: 768px) {
+  nav { padding: 0 20px; }
+  .nav-links { gap: 16px; }
+  .nav-links a:not(.nav-cta) { display: none; }
+}
+
+/* ═══════════════════════════════════════════
+   HERO
+   ═══════════════════════════════════════════ */
+.hero {
+  position: relative; z-index: 1;
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 120px 48px 80px;
+}
+.hero-inner {
+  max-width: 900px; text-align: center;
+}
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 16px 6px 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 100px;
+  font-family: var(--font-mono); font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+  animation: fadeUp 0.6s ease both;
+}
+.hero-badge .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px rgba(99,210,151,0.5);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+.hero-title {
+  font-family: var(--font-serif);
+  font-size: clamp(48px, 7vw, 84px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -1.5px;
+  margin-bottom: 28px;
+  animation: fadeUp 0.6s 0.1s ease both;
+}
+.hero-title em {
+  font-style: italic;
+  background: linear-gradient(135deg, var(--green) 0%, var(--blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: clamp(17px, 2.2vw, 20px);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto 44px;
+  animation: fadeUp 0.6s 0.2s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* CTA + QR cluster */
+.hero-cta-cluster {
+  display: flex; align-items: stretch; justify-content: center; gap: 28px;
+  animation: fadeUp 0.6s 0.3s ease both;
+}
+
+.cta-form-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 16px;
+  padding: 32px;
+  text-align: left;
+  width: 440px;
+}
+.cta-form-card h3 {
+  font-family: var(--font-sans);
+  font-size: 16px; font-weight: 600;
+  margin-bottom: 4px;
+}
+.cta-form-card p {
+  font-size: 13px; color: var(--text-muted);
+  margin-bottom: 18px;
+}
+.cta-input-row {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.cta-input {
+  flex: 1; padding: 12px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-family: var(--font-mono); font-size: 13px;
+  outline: none; transition: all 0.15s;
+}
+.cta-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(99,210,151,0.1); }
+.cta-input::placeholder { color: var(--text-muted); }
+.cta-btn {
+  padding: 12px 24px; border: none; border-radius: 8px;
+  background: var(--green); color: var(--bg-void);
+  font-family: var(--font-sans); font-size: 14px; font-weight: 700;
+  cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  box-shadow: 0 0 24px rgba(99,210,151,0.15);
+  transition: all 0.15s;
+}
+.cta-btn:hover { background: #7adcab; box-shadow: 0 0 32px rgba(99,210,151,0.25); transform: translateY(-1px); }
+.cta-btn:active { transform: translateY(0); }
+.cta-success {
+  display: none;
+  padding: 14px;
+  background: var(--green-dim);
+  border: 1px solid rgba(99,210,151,0.2);
+  border-radius: 8px;
+  font-size: 13px; color: var(--green);
+  text-align: center;
+}
+.cta-count {
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--text-muted); margin-top: 10px;
+}
+
+.qr-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 200px;
+}
+.qr-card .qr-box {
+  width: 140px; height: 140px;
+  background: white;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+}
+.qr-card .qr-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .hero { padding: 100px 20px 60px; }
+  .hero-cta-cluster { flex-direction: column; align-items: center; }
+  .cta-form-card { width: 100%; max-width: 400px; }
+  .qr-card { width: 100%; max-width: 400px; flex-direction: row; gap: 20px; padding: 20px 28px; }
+  .qr-card .qr-box { width: 80px; height: 80px; margin-bottom: 0; flex-shrink: 0; }
+}
+
+/* ═══════════════════════════════════════════
+   TERMINAL DEMO (below hero)
+   ═══════════════════════════════════════════ */
+.terminal-showcase {
+  position: relative; z-index: 1;
+  max-width: 800px;
+  margin: -20px auto 0;
+  padding: 0 48px;
+  animation: fadeUp 0.6s 0.5s ease both;
+}
+.terminal-window {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow:
+    0 4px 60px rgba(0,0,0,0.4),
+    0 0 0 1px rgba(255,255,255,0.03),
+    0 0 80px rgba(99,210,151,0.04);
+}
+.terminal-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 16px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+.terminal-dot.r { background: #ff5f57; }
+.terminal-dot.y { background: #febc2e; }
+.terminal-dot.g { background: #28c840; }
+.terminal-bar-title {
+  flex: 1; text-align: center;
+  font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);
+}
+.terminal-body {
+  padding: 20px 24px;
+  font-family: var(--font-mono); font-size: 13px;
+  line-height: 1.8; color: var(--text-secondary);
+  min-height: 220px;
+}
+.terminal-body .prompt { color: var(--green); }
+.terminal-body .cmd { color: var(--text-primary); }
+.terminal-body .out { color: var(--text-secondary); }
+.terminal-body .info { color: var(--blue); }
+.terminal-body .dim { color: var(--text-muted); }
+.terminal-body .success { color: var(--green); }
+.terminal-body .line { min-height: 1.8em; }
+.cursor {
+  display: inline-block; width: 8px; height: 16px;
+  background: var(--green); vertical-align: text-bottom;
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+@media (max-width: 768px) {
+  .terminal-showcase { padding: 0 16px; }
+  .terminal-body { font-size: 11px; padding: 16px; }
+}
+
+/* ═══════════════════════════════════════════
+   SECTIONS (shared)
+   ═══════════════════════════════════════════ */
+section {
+  position: relative; z-index: 1;
+  padding: 120px 48px;
+}
+.section-inner {
+  max-width: 1100px; margin: 0 auto;
+}
+.section-label {
+  font-family: var(--font-mono); font-size: 11px;
+  text-transform: uppercase; letter-spacing: 2px;
+  color: var(--green); margin-bottom: 12px;
+}
+.section-title {
+  font-family: var(--font-serif);
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 400; line-height: 1.15;
+  margin-bottom: 16px;
+}
+.section-desc {
+  font-size: 17px; color: var(--text-secondary);
+  line-height: 1.6; max-width: 560px;
+  margin-bottom: 48px;
+}
+
+@media (max-width: 768px) {
+  section { padding: 80px 20px; }
+}
+
+/* ═══════════════════════════════════════════
+   FEATURES
+   ═══════════════════════════════════════════ */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.feature-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 28px;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.feature-card:hover {
+  border-color: var(--border-default);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+}
+.feature-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--green) 50%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.feature-card:hover::before { opacity: 0.5; }
+.feature-icon {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; margin-bottom: 18px;
+}
+.feature-icon img {
+  width: 100%; height: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+}
+.feature-title {
+  font-size: 16px; font-weight: 600;
+  margin-bottom: 8px;
+}
+.feature-desc {
+  font-size: 13.5px; color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .features-grid { grid-template-columns: 1fr; }
+}
+
+/* ═══════════════════════════════════════════
+   HOW IT WORKS
+   ═══════════════════════════════════════════ */
+.steps-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  counter-reset: steps;
+}
+.step-card {
+  counter-increment: steps;
+  position: relative;
+  padding: 28px 24px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  transition: all 0.2s;
+}
+.step-card:hover { border-color: var(--border-default); }
+.step-card::before {
+  content: counter(steps, decimal-leading-zero);
+  font-family: var(--font-mono); font-size: 40px;
+  font-weight: 700; color: var(--bg-elevated);
+  line-height: 1; margin-bottom: 16px; display: block;
+}
+.step-card:hover::before { color: var(--green-dim); }
+.step-card h4 {
+  font-size: 15px; font-weight: 600; margin-bottom: 8px;
+}
+.step-card p {
+  font-size: 13px; color: var(--text-secondary); line-height: 1.55;
+}
+/* Connector line */
+.step-card:not(:last-child)::after {
+  content: '→';
+  position: absolute;
+  right: -18px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+@media (max-width: 900px) {
+  .steps-row { grid-template-columns: 1fr 1fr; }
+  .step-card::after { display: none; }
+}
+@media (max-width: 600px) {
+  .steps-row { grid-template-columns: 1fr; }
+}
+
+/* ═══════════════════════════════════════════
+   AGENT SHOWCASE
+   ═══════════════════════════════════════════ */
+.agents-showcase {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.agent-showcase-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  transition: all 0.2s;
+}
+.agent-showcase-card:hover {
+  border-color: var(--border-default);
+  transform: translateY(-2px);
+}
+.agent-showcase-card .emoji {
+  font-size: 32px; margin-bottom: 12px;
+}
+.agent-showcase-card .icon-img {
+  width: 64px; height: 64px;
+  border-radius: 12px;
+  object-fit: cover;
+  margin-bottom: 12px;
+}
+.agent-showcase-card .name {
+  font-size: 15px; font-weight: 600; margin-bottom: 4px;
+}
+.agent-showcase-card .role {
+  font-size: 12px; color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+@media (max-width: 768px) {
+  .agents-showcase { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ═══════════════════════════════════════════
+   DASHBOARD PREVIEW
+   ═══════════════════════════════════════════ */
+.preview-frame {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 60px rgba(0,0,0,0.3), 0 0 80px rgba(99,210,151,0.03);
+}
+.preview-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 16px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.preview-bar .dot { width: 8px; height: 8px; border-radius: 50%; }
+.preview-bar .url {
+  flex: 1; text-align: center;
+  font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);
+}
+.preview-body {
+  position: relative;
+  height: 420px;
+  overflow: hidden;
+}
+.preview-body img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: top left;
+}
+/* We'll use an iframe instead of image for the live preview */
+.preview-body iframe {
+  width: 200%; height: 200%;
+  transform: scale(0.5);
+  transform-origin: top left;
+  border: none;
+  pointer-events: none;
+}
+.preview-overlay {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 120px;
+  background: linear-gradient(transparent, var(--bg-void));
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════
+   PRICING TEASER
+   ═══════════════════════════════════════════ */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.price-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 32px;
+  transition: all 0.2s;
+  position: relative;
+}
+.price-card:hover { border-color: var(--border-default); }
+.price-card.featured {
+  border-color: var(--green);
+  background: linear-gradient(180deg, rgba(99,210,151,0.06) 0%, var(--bg-surface) 100%);
+}
+.price-card.featured::before {
+  content: 'Most Popular';
+  position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+  padding: 4px 14px; border-radius: 20px;
+  background: var(--green); color: var(--bg-void);
+  font-family: var(--font-mono); font-size: 10px;
+  text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;
+}
+.price-name {
+  font-family: var(--font-mono); font-size: 12px;
+  text-transform: uppercase; letter-spacing: 1px;
+  color: var(--text-muted); margin-bottom: 8px;
+}
+.price-amount {
+  font-family: var(--font-serif); font-size: 42px;
+  margin-bottom: 4px;
+}
+.price-amount span { font-size: 16px; color: var(--text-muted); }
+.price-period { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+.price-features { list-style: none; margin-bottom: 28px; }
+.price-features li {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 0; font-size: 13.5px; color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.price-features li:last-child { border-bottom: none; }
+.price-features .check { color: var(--green); font-size: 14px; }
+.price-btn {
+  display: block; width: 100%; padding: 12px;
+  border-radius: 8px; border: none;
+  font-family: var(--font-sans); font-size: 14px; font-weight: 600;
+  cursor: pointer; text-align: center; transition: all 0.15s;
+  text-decoration: none;
+}
+.price-btn-outline {
+  background: transparent; color: var(--text-primary);
+  border: 1px solid var(--border-default);
+}
+.price-btn-outline:hover { border-color: var(--green); background: var(--green-dim); }
+.price-btn-primary {
+  background: var(--green); color: var(--bg-void);
+  box-shadow: 0 0 20px rgba(99,210,151,0.12);
+}
+.price-btn-primary:hover { background: #7adcab; transform: translateY(-1px); }
+
+@media (max-width: 900px) {
+  .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
+}
+
+/* ═══════════════════════════════════════════
+   FOOTER CTA
+   ═══════════════════════════════════════════ */
+.footer-cta {
+  position: relative; z-index: 1;
+  padding: 100px 48px;
+  text-align: center;
+}
+.footer-cta-inner {
+  max-width: 600px; margin: 0 auto;
+}
+.footer-cta h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(32px, 4vw, 44px);
+  margin-bottom: 16px;
+}
+.footer-cta p {
+  font-size: 16px; color: var(--text-secondary);
+  line-height: 1.6; margin-bottom: 32px;
+}
+
+/* ═══════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════ */
+footer {
+  position: relative; z-index: 1;
+  padding: 40px 48px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex; align-items: center; justify-content: space-between;
+}
+footer .left { display: flex; align-items: center; gap: 10px; }
+footer .left .logo-sm {
+  width: 22px; height: 22px; border-radius: 5px;
+  overflow: hidden;
+}
+footer .left .logo-sm img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  border-radius: 5px;
+}
+footer .copy { font-size: 12px; color: var(--text-muted); }
+footer .right { display: flex; gap: 24px; }
+footer .right a { font-size: 12px; color: var(--text-muted); text-decoration: none; }
+footer .right a:hover { color: var(--text-secondary); }
+
+@media (max-width: 768px) {
+  footer { flex-direction: column; gap: 16px; padding: 32px 20px; }
+}
+
+/* ═══════════════════════════════════════════
+   SCROLL ANIMATIONS
+   ═══════════════════════════════════════════ */
+.reveal {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible {
+  opacity: 1; transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+</style>
+</head>
+<body>
+
+<div class="atmosphere"></div>
+<div class="grid-bg"></div>
+
+<!-- ═══════════════ NAV ═══════════════ -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-icon"><img src="logo.png" alt="AgentsHQ"></div>
+    <span class="nav-logo-text">AgentsHQ</span>
+  </div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#how-it-works">How It Works</a>
+    <a href="#pricing">Pricing</a>
+    <a href="setup.html" style="color:var(--green) !important;">Try Demo ↗</a>
+    <a href="#waitlist" class="nav-cta">Join Waitlist</a>
+  </div>
+</nav>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      Now accepting early access signups
+    </div>
+
+    <h1 class="hero-title">
+      Your AI agents.<br>
+      Your infrastructure.<br>
+      <em>Your rules.</em>
+    </h1>
+
+    <p class="hero-sub">
+      Deploy a private fleet of Claude-powered AI agents on your own server.
+      Talk to them on Discord. Own everything. If we disappear, your agents keep running.
+    </p>
+
+    <div class="hero-cta-cluster" id="waitlist">
+      <div class="cta-form-card">
+        <h3>Get early access</h3>
+        <p>Be first in line when we launch. No spam, just one email.</p>
+        <div class="cta-input-row" id="ctaForm">
+          <input type="text" class="cta-input" placeholder="you@email.com" id="emailInput">
+          <button class="cta-btn" onclick="submitWaitlist()">Join Waitlist</button>
+        </div>
+        <div class="cta-success" id="ctaSuccess">
+          ✓ You're on the list. We'll be in touch soon.
+        </div>
+        <div class="cta-count">
+          <span id="waitlistCount">127</span> people already on the waitlist
+        </div>
+      </div>
+
+      <div class="qr-card">
+        <div class="qr-box">
+          <canvas id="qrCanvas" width="140" height="140"></canvas>
+        </div>
+        <div class="qr-label">Scan to open<br>this page</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ TERMINAL DEMO ═══════════════ -->
+<div class="terminal-showcase">
+  <div class="terminal-window">
+    <div class="terminal-bar">
+      <div class="terminal-dot r"></div>
+      <div class="terminal-dot y"></div>
+      <div class="terminal-dot g"></div>
+      <div class="terminal-bar-title">agentshq — setup</div>
+    </div>
+    <div class="terminal-body" id="terminalBody">
+      <!-- Animated by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ FEATURES ═══════════════ -->
+<section id="features">
+  <div class="section-inner">
+    <div class="section-label reveal">What you get</div>
+    <h2 class="section-title reveal reveal-delay-1">Everything you need,<br>nothing you don't</h2>
+    <p class="section-desc reveal reveal-delay-2">
+      A complete AI agent platform that runs on your infrastructure. No vendor lock-in, no data harvesting, no surprises.
+    </p>
+
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon"><img src="feat-multiagent.png" alt="Multi-Agent"></div>
+        <div class="feature-title">Multi-Agent System</div>
+        <div class="feature-desc">Deploy specialized agents — researcher, coder, writer, sysadmin — each with their own personality, memory, and skills. They work independently but share knowledge.</div>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon"><img src="feat-memory.png" alt="Memory"></div>
+        <div class="feature-title">Persistent Memory</div>
+        <div class="feature-desc">Graph-based memory that persists across sessions. Your agents remember context, learn preferences, and build on past conversations. Not just chat history — real understanding.</div>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon"><img src="feat-skills.png" alt="Skills"></div>
+        <div class="feature-title">Extensible Skills</div>
+        <div class="feature-desc">Install skills from ClawHub or write your own. GitHub integration, web search, code execution, cron jobs, knowledge base search — and growing.</div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon"><img src="feat-discord.png" alt="Discord"></div>
+        <div class="feature-title">Discord-Native</div>
+        <div class="feature-desc">Each agent gets its own Discord channel with custom webhooks. Rich embeds, file uploads, threads. Slack and WhatsApp coming soon.</div>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon"><img src="feat-ownership.png" alt="Ownership"></div>
+        <div class="feature-title">You Own Everything</div>
+        <div class="feature-desc">Your server. Your data. Your API keys. Tailscale mesh network for secure access. If we disappear tomorrow, your agents keep running.</div>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon"><img src="feat-dashboard.png" alt="Dashboard"></div>
+        <div class="feature-title">Usage Dashboard</div>
+        <div class="feature-desc">Real-time Claude API usage tracking with rate limit monitoring. Know exactly how much you're using across all agents. Auto-updating widget in Discord.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ AGENT SHOWCASE ═══════════════ -->
+<section style="padding-top:0;">
+  <div class="section-inner">
+    <div class="section-label reveal">Starter Templates</div>
+    <h2 class="section-title reveal reveal-delay-1">Agents that actually do things</h2>
+    <p class="section-desc reveal reveal-delay-2">
+      Pick a template or build your own. Each agent has a distinct personality, skillset, and purpose.
+    </p>
+
+    <div class="agents-showcase reveal">
+      <div class="agent-showcase-card">
+        <img class="icon-img" src="icon-general.png" alt="General">
+        <div class="name">General</div>
+        <div class="role">All-purpose assistant</div>
+      </div>
+      <div class="agent-showcase-card">
+        <img class="icon-img" src="icon-code.png" alt="Code">
+        <div class="name">Code</div>
+        <div class="role">Dev + debugging</div>
+      </div>
+      <div class="agent-showcase-card">
+        <img class="icon-img" src="icon-recon.png" alt="Recon">
+        <div class="name">Recon</div>
+        <div class="role">Deep research</div>
+      </div>
+      <div class="agent-showcase-card">
+        <img class="icon-img" src="icon-sysadmin.png" alt="Sysadmin">
+        <div class="name">Sysadmin</div>
+        <div class="role">Infra management</div>
+      </div>
+      <div class="agent-showcase-card">
+        <img class="icon-img" src="icon-writer.png" alt="Writer">
+        <div class="name">Writer</div>
+        <div class="role">Content creation</div>
+      </div>
+      <div class="agent-showcase-card">
+        <img class="icon-img" src="icon-analyst.png" alt="Analyst">
+        <div class="name">Analyst</div>
+        <div class="role">Market research</div>
+      </div>
+      <div class="agent-showcase-card">
+        <img class="icon-img" src="icon-designer.png" alt="Designer">
+        <div class="name">Designer</div>
+        <div class="role">UI/UX feedback</div>
+      </div>
+      <div class="agent-showcase-card">
+        <img class="icon-img" src="icon-custom.png" alt="Custom">
+        <div class="name">Custom</div>
+        <div class="role">Build your own</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ HOW IT WORKS ═══════════════ -->
+<section id="how-it-works">
+  <div class="section-inner">
+    <div class="section-label reveal">How it works</div>
+    <h2 class="section-title reveal reveal-delay-1">Live in 10 minutes</h2>
+    <p class="section-desc reveal reveal-delay-2">
+      From zero to a fleet of AI agents in four steps. Our setup wizard handles the hard parts.
+    </p>
+
+    <div class="steps-row reveal">
+      <div class="step-card">
+        <h4>Provision</h4>
+        <p>We spin up a Fly.io instance with persistent storage, pre-configured with everything you need. One click.</p>
+      </div>
+      <div class="step-card">
+        <h4>Connect</h4>
+        <p>Create a Discord bot, link your server. Our wizard walks you through it step by step. Tailscale for security.</p>
+      </div>
+      <div class="step-card">
+        <h4>Authenticate</h4>
+        <p>Log in to Claude via OAuth — uses your existing Pro or Max subscription. No separate API key needed.</p>
+      </div>
+      <div class="step-card">
+        <h4>Deploy</h4>
+        <p>Pick an agent template, customize your crew, hit launch. Your agents come online in Discord immediately.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ DASHBOARD PREVIEW ═══════════════ -->
+<section style="padding-top:0;">
+  <div class="section-inner">
+    <div class="section-label reveal">Management Panel</div>
+    <h2 class="section-title reveal reveal-delay-1">Full control from one dashboard</h2>
+    <p class="section-desc reveal reveal-delay-2">
+      Monitor agents, track usage, manage skills, browse memories, and configure everything — without touching a terminal.
+    </p>
+
+    <div class="preview-frame reveal">
+      <div class="preview-bar">
+        <div class="dot r" style="background:#ff5f57;width:8px;height:8px;border-radius:50%;"></div>
+        <div class="dot y" style="background:#febc2e;width:8px;height:8px;border-radius:50%;"></div>
+        <div class="dot g" style="background:#28c840;width:8px;height:8px;border-radius:50%;"></div>
+        <div class="url">agentshq-demo.fly.dev/manage</div>
+      </div>
+      <div class="preview-body">
+        <iframe src="manage.html" loading="lazy"></iframe>
+        <div class="preview-overlay"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ PRICING ═══════════════ -->
+<section id="pricing">
+  <div class="section-inner">
+    <div class="section-label reveal">Pricing</div>
+    <h2 class="section-title reveal reveal-delay-1">Simple, transparent pricing</h2>
+    <p class="section-desc reveal reveal-delay-2">
+      You bring your own Claude subscription. We handle the infrastructure and tooling.
+    </p>
+
+    <div class="pricing-grid reveal">
+      <div class="price-card">
+        <div class="price-name">Starter</div>
+        <div class="price-amount">$29<span>/mo</span></div>
+        <div class="price-period">+ your Claude subscription</div>
+        <ul class="price-features">
+          <li><span class="check">✓</span> Managed Fly.io instance</li>
+          <li><span class="check">✓</span> Up to 4 agents</li>
+          <li><span class="check">✓</span> Discord integration</li>
+          <li><span class="check">✓</span> Persistent memory</li>
+          <li><span class="check">✓</span> Community skills</li>
+          <li><span class="check">✓</span> Email support</li>
+        </ul>
+        <a href="#waitlist" class="price-btn price-btn-outline">Join Waitlist</a>
+      </div>
+
+      <div class="price-card featured">
+        <div class="price-name">Pro</div>
+        <div class="price-amount">$59<span>/mo</span></div>
+        <div class="price-period">+ your Claude subscription</div>
+        <ul class="price-features">
+          <li><span class="check">✓</span> Everything in Starter</li>
+          <li><span class="check">✓</span> Unlimited agents</li>
+          <li><span class="check">✓</span> Multi-platform (Slack, WhatsApp)</li>
+          <li><span class="check">✓</span> Tailscale auto-config</li>
+          <li><span class="check">✓</span> Knowledge base (Obsidian)</li>
+          <li><span class="check">✓</span> Priority support</li>
+        </ul>
+        <a href="#waitlist" class="price-btn price-btn-primary">Join Waitlist</a>
+      </div>
+
+      <div class="price-card">
+        <div class="price-name">Self-Hosted</div>
+        <div class="price-amount">Free</div>
+        <div class="price-period">Open source, DIY</div>
+        <ul class="price-features">
+          <li><span class="check">✓</span> Full source code</li>
+          <li><span class="check">✓</span> Unlimited everything</li>
+          <li><span class="check">✓</span> Your own infrastructure</li>
+          <li><span class="check">✓</span> Community support</li>
+          <li><span class="check" style="color:var(--text-muted);">—</span> <span style="color:var(--text-muted);">No managed hosting</span></li>
+          <li><span class="check" style="color:var(--text-muted);">—</span> <span style="color:var(--text-muted);">No setup wizard</span></li>
+        </ul>
+        <a href="https://github.com/akatz-ai/nanobot" target="_blank" class="price-btn price-btn-outline">View on GitHub</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FOOTER CTA ═══════════════ -->
+<div class="footer-cta">
+  <div class="footer-cta-inner reveal">
+    <h2>Ready to own your AI?</h2>
+    <p>Join the waitlist and be first to deploy your own agent fleet. Early access members get 50% off for life.</p>
+    <div class="cta-input-row" style="max-width:420px;margin:0 auto;">
+      <input type="text" class="cta-input" placeholder="you@email.com" id="emailInput2">
+      <button class="cta-btn" onclick="submitWaitlist2()">Join Waitlist</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  <div class="left">
+    <div class="logo-sm"><img src="logo.png" alt="AgentsHQ"></div>
+    <span class="copy">© 2026 AgentsHQ. All rights reserved.</span>
+  </div>
+  <div class="right">
+    <a href="https://github.com/akatz-ai/nanobot" target="_blank">GitHub</a>
+    <a href="#">Docs</a>
+    <a href="#">Discord</a>
+    <a href="#">Privacy</a>
+  </div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════
+// WAITLIST FORM
+// ═══════════════════════════════════════════
+function submitWaitlist() {
+  const email = document.getElementById('emailInput').value;
+  if (!email || !email.includes('@')) {
+    document.getElementById('emailInput').style.borderColor = 'var(--red)';
+    setTimeout(() => document.getElementById('emailInput').style.borderColor = '', 1500);
+    return;
+  }
+  document.getElementById('ctaForm').style.display = 'none';
+  document.getElementById('ctaSuccess').style.display = 'block';
+  const count = document.getElementById('waitlistCount');
+  count.textContent = parseInt(count.textContent) + 1;
+}
+
+function submitWaitlist2() {
+  const email = document.getElementById('emailInput2').value;
+  if (!email || !email.includes('@')) return;
+  document.getElementById('emailInput2').value = '';
+  document.getElementById('emailInput2').placeholder = '✓ You\'re on the list!';
+  document.getElementById('emailInput2').disabled = true;
+}
+
+// ═══════════════════════════════════════════
+// QR CODE (minimal canvas-drawn)
+// ═══════════════════════════════════════════
+function drawQR() {
+  const canvas = document.getElementById('qrCanvas');
+  const ctx = canvas.getContext('2d');
+  const size = 140;
+  const modules = 25;
+  const cellSize = size / modules;
+
+  // Generate a deterministic pattern that looks like a QR code
+  // This is a MOCK — in production, use a real QR library
+  const seed = 42;
+  function pseudoRandom(x, y) {
+    const n = Math.sin(x * 127.1 + y * 311.7 + seed) * 43758.5453;
+    return n - Math.floor(n);
+  }
+
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, size, size);
+  ctx.fillStyle = '#0a0c11';
+
+  // Finder patterns (3 corners)
+  function drawFinder(ox, oy) {
+    // Outer
+    ctx.fillRect(ox * cellSize, oy * cellSize, 7 * cellSize, 7 * cellSize);
+    ctx.fillStyle = 'white';
+    ctx.fillRect((ox + 1) * cellSize, (oy + 1) * cellSize, 5 * cellSize, 5 * cellSize);
+    ctx.fillStyle = '#0a0c11';
+    ctx.fillRect((ox + 2) * cellSize, (oy + 2) * cellSize, 3 * cellSize, 3 * cellSize);
+  }
+
+  drawFinder(0, 0);
+  drawFinder(modules - 7, 0);
+  drawFinder(0, modules - 7);
+
+  // Data area (pseudo-random fill)
+  for (let y = 0; y < modules; y++) {
+    for (let x = 0; x < modules; x++) {
+      // Skip finder pattern areas
+      if ((x < 8 && y < 8) || (x >= modules - 8 && y < 8) || (x < 8 && y >= modules - 8)) continue;
+      // Timing patterns
+      if (x === 6 || y === 6) {
+        if ((x + y) % 2 === 0) ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+        continue;
+      }
+      if (pseudoRandom(x, y) > 0.5) {
+        ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+      }
+    }
+  }
+
+  // Center logo (draw image)
+  const logoSize = 5 * cellSize;
+  const logoX = (size - logoSize) / 2;
+  ctx.fillStyle = 'white';
+  ctx.fillRect(logoX - 2, logoX - 2, logoSize + 4, logoSize + 4);
+
+  const logoImg = new Image();
+  logoImg.onload = function() {
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(logoX, logoX, logoSize, logoSize, 4);
+    ctx.clip();
+    ctx.drawImage(logoImg, logoX, logoX, logoSize, logoSize);
+    ctx.restore();
+  };
+  logoImg.src = 'logo.png';
+}
+
+// ═══════════════════════════════════════════
+// TERMINAL ANIMATION
+// ═══════════════════════════════════════════
+async function animateTerminal() {
+  const body = document.getElementById('terminalBody');
+  const lines = [
+    { text: '<span class="prompt">$</span> <span class="cmd">agentshq provision --starter</span>', delay: 600 },
+    { text: '<span class="info">→</span> <span class="out">Creating Fly.io instance in ord...</span>', delay: 400 },
+    { text: '<span class="dim">  Volume: 10GB persistent storage</span>', delay: 300 },
+    { text: '<span class="dim">  Image: agentshq/stack:latest</span>', delay: 300 },
+    { text: '<span class="success">✓</span> <span class="out">Instance ready — agentshq-demo.fly.dev</span>', delay: 500 },
+    { text: '', delay: 200 },
+    { text: '<span class="prompt">$</span> <span class="cmd">agentshq provision --discord</span>', delay: 500 },
+    { text: '<span class="dim">  Creating #general, #code, #research, #admin</span>', delay: 300 },
+    { text: '<span class="dim">  Webhooks configured for 4 agents</span>', delay: 300 },
+    { text: '<span class="success">✓</span> <span class="out">Discord server provisioned</span>', delay: 400 },
+    { text: '', delay: 200 },
+    { text: '<span class="prompt">$</span> <span class="cmd">agentshq gateway --daemon</span>', delay: 500 },
+    { text: '<span class="dim">  Starting 4 agents...</span>', delay: 300 },
+    { text: '<span class="success">✓</span> <span class="success">All agents online. Your agents are live!</span>', delay: 0 },
+  ];
+
+  for (const line of lines) {
+    const div = document.createElement('div');
+    div.className = 'line';
+    div.innerHTML = line.text || '&nbsp;';
+    body.appendChild(div);
+    await new Promise(r => setTimeout(r, line.delay + Math.random() * 200));
+  }
+
+  // Add blinking cursor
+  const cursorLine = document.createElement('div');
+  cursorLine.className = 'line';
+  cursorLine.innerHTML = '<span class="prompt">$</span> <span class="cursor"></span>';
+  body.appendChild(cursorLine);
+}
+
+// ═══════════════════════════════════════════
+// SCROLL REVEAL
+// ═══════════════════════════════════════════
+function initReveal() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+}
+
+// ═══════════════════════════════════════════
+// SMOOTH SCROLL FOR NAV LINKS
+// ═══════════════════════════════════════════
+document.querySelectorAll('a[href^="#"]').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+drawQR();
+initReveal();
+setTimeout(animateTerminal, 800);
+</script>
+
+</body>
+</html>
