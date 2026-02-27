@@ -280,8 +280,8 @@ nav {
   .hero { padding: 100px 20px 60px; }
   .hero-cta-cluster { flex-direction: column; align-items: center; }
   .cta-form-card { width: 100%; max-width: 400px; }
-  .qr-card { width: 100%; max-width: 400px; flex-direction: row; gap: 20px; padding: 20px 28px; }
-  .qr-card .qr-box { width: 80px; height: 80px; margin-bottom: 0; flex-shrink: 0; }
+  .qr-card { width: auto; max-width: 200px; flex-direction: column; padding: 20px; }
+  .qr-card .qr-box { width: 140px; height: 140px; margin-bottom: 12px; }
 }
 
 /* ═══════════════════════════════════════════
@@ -745,7 +745,7 @@ footer .right a:hover { color: var(--text-secondary); }
 
       <div class="qr-card">
         <div class="qr-box">
-          <canvas id="qrCanvas" width="140" height="140"></canvas>
+          <canvas id="qrCanvas" width="280" height="280" style="width:140px;height:140px;"></canvas>
         </div>
         <div class="qr-label">Scan to open<br>this page</div>
       </div>
@@ -1085,7 +1085,8 @@ function drawQR() {
   qr.make();
 
   const ctx = canvas.getContext('2d');
-  const size = 140;
+  const scale = 2;
+  const size = 140 * scale;
   const modules = qr.getModuleCount();
   const cellSize = size / modules;
 
@@ -1105,13 +1106,13 @@ function drawQR() {
   const logoSize = 5 * cellSize;
   const logoX = (size - logoSize) / 2;
   ctx.fillStyle = 'white';
-  ctx.fillRect(logoX - 2, logoX - 2, logoSize + 4, logoSize + 4);
+  ctx.fillRect(logoX - 3, logoX - 3, logoSize + 6, logoSize + 6);
 
   const logoImg = new Image();
   logoImg.onload = function() {
     ctx.save();
     ctx.beginPath();
-    ctx.roundRect(logoX, logoX, logoSize, logoSize, 4);
+    ctx.roundRect(logoX, logoX, logoSize, logoSize, 6);
     ctx.clip();
     ctx.drawImage(logoImg, logoX, logoX, logoSize, logoSize);
     ctx.restore();
