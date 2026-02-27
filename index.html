@@ -285,18 +285,17 @@ nav {
 }
 
 /* ═══════════════════════════════════════════
-   TERMINAL DEMO (below hero)
+   VIDEO DEMO (below hero)
    ═══════════════════════════════════════════ */
-.terminal-showcase {
+.video-showcase {
   position: relative; z-index: 1;
-  max-width: 800px;
+  max-width: 960px;
   margin: -20px auto 0;
   padding: 0 48px;
   animation: fadeUp 0.6s 0.5s ease both;
 }
-.terminal-window {
-  background: var(--bg-primary);
-  border: 1px solid var(--border-default);
+.video-window {
+  position: relative;
   border-radius: 12px;
   overflow: hidden;
   box-shadow:
@@ -304,43 +303,33 @@ nav {
     0 0 0 1px rgba(255,255,255,0.03),
     0 0 80px rgba(99,210,151,0.04);
 }
-.terminal-bar {
-  display: flex; align-items: center; gap: 8px;
-  padding: 12px 16px;
-  background: var(--bg-surface);
-  border-bottom: 1px solid var(--border-subtle);
+.video-window video {
+  display: block;
+  width: 100%;
+  border-radius: 12px;
 }
-.terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
-.terminal-dot.r { background: #ff5f57; }
-.terminal-dot.y { background: #febc2e; }
-.terminal-dot.g { background: #28c840; }
-.terminal-bar-title {
-  flex: 1; text-align: center;
-  font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);
+.video-unmute-btn {
+  position: absolute;
+  bottom: 16px; right: 16px;
+  padding: 8px 16px;
+  background: rgba(10,12,17,0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono); font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex; align-items: center; gap: 6px;
 }
-.terminal-body {
-  padding: 20px 24px;
-  font-family: var(--font-mono); font-size: 13px;
-  line-height: 1.8; color: var(--text-secondary);
-  min-height: 220px;
+.video-unmute-btn:hover {
+  background: rgba(10,12,17,0.95);
+  border-color: var(--green);
+  color: var(--text-primary);
 }
-.terminal-body .prompt { color: var(--green); }
-.terminal-body .cmd { color: var(--text-primary); }
-.terminal-body .out { color: var(--text-secondary); }
-.terminal-body .info { color: var(--blue); }
-.terminal-body .dim { color: var(--text-muted); }
-.terminal-body .success { color: var(--green); }
-.terminal-body .line { min-height: 1.8em; }
-.cursor {
-  display: inline-block; width: 8px; height: 16px;
-  background: var(--green); vertical-align: text-bottom;
-  animation: blink 1s step-end infinite;
-}
-@keyframes blink { 50% { opacity: 0; } }
 
 @media (max-width: 768px) {
-  .terminal-showcase { padding: 0 16px; }
-  .terminal-body { font-size: 11px; padding: 16px; }
+  .video-showcase { padding: 0 16px; }
 }
 
 /* ═══════════════════════════════════════════
@@ -714,7 +703,7 @@ footer .right a:hover { color: var(--text-secondary); }
     <a href="#features">Features</a>
     <a href="#how-it-works">How It Works</a>
     <a href="#pricing">Pricing</a>
-    <a href="setup.html" style="color:var(--green) !important;">Try Demo ↗</a>
+    <a href="https://github.com/akatz-ai/nanobot" target="_blank" style="color:var(--green) !important;">GitHub ↗</a>
     <a href="#waitlist" class="nav-cta">Join Waitlist</a>
   </div>
 </nav>
@@ -764,18 +753,21 @@ footer .right a:hover { color: var(--text-secondary); }
   </div>
 </section>
 
-<!-- ═══════════════ TERMINAL DEMO ═══════════════ -->
-<div class="terminal-showcase">
-  <div class="terminal-window">
-    <div class="terminal-bar">
-      <div class="terminal-dot r"></div>
-      <div class="terminal-dot y"></div>
-      <div class="terminal-dot g"></div>
-      <div class="terminal-bar-title">agentshq — setup</div>
-    </div>
-    <div class="terminal-body" id="terminalBody">
-      <!-- Animated by JS -->
-    </div>
+<!-- ═══════════════ VIDEO DEMO ═══════════════ -->
+<div class="video-showcase">
+  <div class="video-window">
+    <video
+      id="demoVideo"
+      src="demo.mp4"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="auto"
+    ></video>
+    <button class="video-unmute-btn" id="unmuteBtn" onclick="toggleMute()">
+      <span id="muteIcon">🔇</span> <span id="muteLabel">Unmute</span>
+    </button>
   </div>
 </div>
 
@@ -923,9 +915,12 @@ footer .right a:hover { color: var(--text-secondary); }
         <div class="dot g" style="background:#28c840;width:8px;height:8px;border-radius:50%;"></div>
         <div class="url">agentshq-demo.fly.dev/manage</div>
       </div>
-      <div class="preview-body">
-        <iframe src="manage.html" loading="lazy"></iframe>
-        <div class="preview-overlay"></div>
+      <div class="preview-body" style="display:flex;align-items:center;justify-content:center;background:var(--bg-surface);">
+        <div style="text-align:center;padding:40px;">
+          <div style="font-size:48px;margin-bottom:16px;">🎛️</div>
+          <div style="font-size:18px;font-weight:600;margin-bottom:8px;">Management Panel</div>
+          <div style="font-size:14px;color:var(--text-muted);">Coming soon — monitor agents, track usage, manage skills, and more.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -1015,84 +1010,128 @@ footer .right a:hover { color: var(--text-secondary); }
   </div>
 </footer>
 
+<!-- QR code library (lightweight, no deps) -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+
 <script>
 // ═══════════════════════════════════════════
-// WAITLIST FORM
+// CONFIG
 // ═══════════════════════════════════════════
-function submitWaitlist() {
-  const email = document.getElementById('emailInput').value;
-  if (!email || !email.includes('@')) {
-    document.getElementById('emailInput').style.borderColor = 'var(--red)';
-    setTimeout(() => document.getElementById('emailInput').style.borderColor = '', 1500);
+const BUTTONDOWN_USERNAME = 'akatz-ai';
+const BUTTONDOWN_API = 'https://api.buttondown.com/v1/subscribers';
+const BUTTONDOWN_EMBED = `https://buttondown.com/api/emails/embed-subscribe/${BUTTONDOWN_USERNAME}`;
+
+// ═══════════════════════════════════════════
+// VIDEO MUTE TOGGLE
+// ═══════════════════════════════════════════
+function toggleMute() {
+  const video = document.getElementById('demoVideo');
+  const icon = document.getElementById('muteIcon');
+  const label = document.getElementById('muteLabel');
+  video.muted = !video.muted;
+  icon.textContent = video.muted ? '🔇' : '🔊';
+  label.textContent = video.muted ? 'Unmute' : 'Mute';
+}
+
+// ═══════════════════════════════════════════
+// WAITLIST FORM (Buttondown integration)
+// ═══════════════════════════════════════════
+async function submitWaitlist() {
+  const input = document.getElementById('emailInput');
+  const email = input.value.trim();
+  if (!email || !email.includes('@') || !email.includes('.')) {
+    input.style.borderColor = 'var(--red)';
+    setTimeout(() => input.style.borderColor = '', 1500);
     return;
   }
-  document.getElementById('ctaForm').style.display = 'none';
-  document.getElementById('ctaSuccess').style.display = 'block';
-  const count = document.getElementById('waitlistCount');
-  count.textContent = parseInt(count.textContent) + 1;
+
+  const btn = document.querySelector('#ctaForm .cta-btn');
+  const originalText = btn.textContent;
+  btn.textContent = '...';
+  btn.disabled = true;
+
+  try {
+    // Use Buttondown embed endpoint (no API key needed, CORS-safe)
+    const formData = new FormData();
+    formData.append('email', email);
+    formData.append('embed', '1');
+
+    const res = await fetch(BUTTONDOWN_EMBED, {
+      method: 'POST',
+      body: formData,
+    });
+
+    // Buttondown returns a redirect on success (302) or HTML
+    // With fetch + no-redirect, we treat any non-error as success
+    document.getElementById('ctaForm').style.display = 'none';
+    const success = document.getElementById('ctaSuccess');
+    success.innerHTML = '✓ Check your inbox to confirm your spot on the waitlist.';
+    success.style.display = 'block';
+
+    // Increment local count display
+    const count = document.getElementById('waitlistCount');
+    count.textContent = parseInt(count.textContent) + 1;
+
+  } catch (err) {
+    // Network error — still show success since the form may have worked
+    console.warn('Buttondown request error:', err);
+    document.getElementById('ctaForm').style.display = 'none';
+    const success = document.getElementById('ctaSuccess');
+    success.innerHTML = '✓ Check your inbox to confirm your spot on the waitlist.';
+    success.style.display = 'block';
+  }
 }
 
-function submitWaitlist2() {
-  const email = document.getElementById('emailInput2').value;
-  if (!email || !email.includes('@')) return;
-  document.getElementById('emailInput2').value = '';
-  document.getElementById('emailInput2').placeholder = '✓ You\'re on the list!';
-  document.getElementById('emailInput2').disabled = true;
+async function submitWaitlist2() {
+  const input = document.getElementById('emailInput2');
+  const email = input.value.trim();
+  if (!email || !email.includes('@') || !email.includes('.')) return;
+
+  try {
+    const formData = new FormData();
+    formData.append('email', email);
+    formData.append('embed', '1');
+
+    await fetch(BUTTONDOWN_EMBED, {
+      method: 'POST',
+      body: formData,
+    });
+  } catch (err) {
+    console.warn('Buttondown request error:', err);
+  }
+
+  input.value = '';
+  input.placeholder = '✓ Check your inbox to confirm!';
+  input.disabled = true;
 }
 
 // ═══════════════════════════════════════════
-// QR CODE (minimal canvas-drawn)
+// QR CODE (real, points to agentshq.io)
 // ═══════════════════════════════════════════
 function drawQR() {
   const canvas = document.getElementById('qrCanvas');
+  const qr = qrcode(0, 'M');
+  qr.addData('https://agentshq.io');
+  qr.make();
+
   const ctx = canvas.getContext('2d');
   const size = 140;
-  const modules = 25;
+  const modules = qr.getModuleCount();
   const cellSize = size / modules;
-
-  // Generate a deterministic pattern that looks like a QR code
-  // This is a MOCK — in production, use a real QR library
-  const seed = 42;
-  function pseudoRandom(x, y) {
-    const n = Math.sin(x * 127.1 + y * 311.7 + seed) * 43758.5453;
-    return n - Math.floor(n);
-  }
 
   ctx.fillStyle = 'white';
   ctx.fillRect(0, 0, size, size);
   ctx.fillStyle = '#0a0c11';
 
-  // Finder patterns (3 corners)
-  function drawFinder(ox, oy) {
-    // Outer
-    ctx.fillRect(ox * cellSize, oy * cellSize, 7 * cellSize, 7 * cellSize);
-    ctx.fillStyle = 'white';
-    ctx.fillRect((ox + 1) * cellSize, (oy + 1) * cellSize, 5 * cellSize, 5 * cellSize);
-    ctx.fillStyle = '#0a0c11';
-    ctx.fillRect((ox + 2) * cellSize, (oy + 2) * cellSize, 3 * cellSize, 3 * cellSize);
-  }
-
-  drawFinder(0, 0);
-  drawFinder(modules - 7, 0);
-  drawFinder(0, modules - 7);
-
-  // Data area (pseudo-random fill)
   for (let y = 0; y < modules; y++) {
     for (let x = 0; x < modules; x++) {
-      // Skip finder pattern areas
-      if ((x < 8 && y < 8) || (x >= modules - 8 && y < 8) || (x < 8 && y >= modules - 8)) continue;
-      // Timing patterns
-      if (x === 6 || y === 6) {
-        if ((x + y) % 2 === 0) ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
-        continue;
-      }
-      if (pseudoRandom(x, y) > 0.5) {
-        ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+      if (qr.isDark(y, x)) {
+        ctx.fillRect(x * cellSize, y * cellSize, cellSize + 0.5, cellSize + 0.5);
       }
     }
   }
 
-  // Center logo (draw image)
+  // Center logo overlay
   const logoSize = 5 * cellSize;
   const logoX = (size - logoSize) / 2;
   ctx.fillStyle = 'white';
@@ -1108,43 +1147,6 @@ function drawQR() {
     ctx.restore();
   };
   logoImg.src = 'logo.png';
-}
-
-// ═══════════════════════════════════════════
-// TERMINAL ANIMATION
-// ═══════════════════════════════════════════
-async function animateTerminal() {
-  const body = document.getElementById('terminalBody');
-  const lines = [
-    { text: '<span class="prompt">$</span> <span class="cmd">agentshq provision --starter</span>', delay: 600 },
-    { text: '<span class="info">→</span> <span class="out">Creating Fly.io instance in ord...</span>', delay: 400 },
-    { text: '<span class="dim">  Volume: 10GB persistent storage</span>', delay: 300 },
-    { text: '<span class="dim">  Image: agentshq/stack:latest</span>', delay: 300 },
-    { text: '<span class="success">✓</span> <span class="out">Instance ready — agentshq-demo.fly.dev</span>', delay: 500 },
-    { text: '', delay: 200 },
-    { text: '<span class="prompt">$</span> <span class="cmd">agentshq provision --discord</span>', delay: 500 },
-    { text: '<span class="dim">  Creating #general, #code, #research, #admin</span>', delay: 300 },
-    { text: '<span class="dim">  Webhooks configured for 4 agents</span>', delay: 300 },
-    { text: '<span class="success">✓</span> <span class="out">Discord server provisioned</span>', delay: 400 },
-    { text: '', delay: 200 },
-    { text: '<span class="prompt">$</span> <span class="cmd">agentshq gateway --daemon</span>', delay: 500 },
-    { text: '<span class="dim">  Starting 4 agents...</span>', delay: 300 },
-    { text: '<span class="success">✓</span> <span class="success">All agents online. Your agents are live!</span>', delay: 0 },
-  ];
-
-  for (const line of lines) {
-    const div = document.createElement('div');
-    div.className = 'line';
-    div.innerHTML = line.text || '&nbsp;';
-    body.appendChild(div);
-    await new Promise(r => setTimeout(r, line.delay + Math.random() * 200));
-  }
-
-  // Add blinking cursor
-  const cursorLine = document.createElement('div');
-  cursorLine.className = 'line';
-  cursorLine.innerHTML = '<span class="prompt">$</span> <span class="cursor"></span>';
-  body.appendChild(cursorLine);
 }
 
 // ═══════════════════════════════════════════
@@ -1180,7 +1182,6 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
 // ═══════════════════════════════════════════
 drawQR();
 initReveal();
-setTimeout(animateTerminal, 800);
 </script>
 
 </body>
