@@ -985,9 +985,7 @@ footer .right a:hover { color: var(--text-secondary); }
 // ═══════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════
-const BUTTONDOWN_USERNAME = 'akatz-ai';
-const BUTTONDOWN_API = 'https://api.buttondown.com/v1/subscribers';
-const BUTTONDOWN_EMBED = `https://buttondown.com/api/emails/embed-subscribe/${BUTTONDOWN_USERNAME}`;
+const WAITLIST_API = 'https://agentshq-waitlist.agentshq.workers.dev';
 
 // ═══════════════════════════════════════════
 // VIDEO MUTE TOGGLE
@@ -1002,7 +1000,7 @@ function toggleMute() {
 }
 
 // ═══════════════════════════════════════════
-// WAITLIST FORM (Buttondown integration)
+// WAITLIST FORM (via Cloudflare Worker → Buttondown)
 // ═══════════════════════════════════════════
 async function submitWaitlist() {
   const input = document.getElementById('emailInput');
@@ -1014,39 +1012,32 @@ async function submitWaitlist() {
   }
 
   const btn = document.querySelector('#ctaForm .cta-btn');
-  const originalText = btn.textContent;
   btn.textContent = '...';
   btn.disabled = true;
 
   try {
-    // Use Buttondown embed endpoint (no API key needed, CORS-safe)
-    const formData = new FormData();
-    formData.append('email', email);
-    formData.append('embed', '1');
-
-    const res = await fetch(BUTTONDOWN_EMBED, {
+    const res = await fetch(WAITLIST_API, {
       method: 'POST',
-      body: formData,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
     });
 
-    // Buttondown returns a redirect on success (302) or HTML
-    // With fetch + no-redirect, we treat any non-error as success
+    const data = await res.json();
+
     document.getElementById('ctaForm').style.display = 'none';
     const success = document.getElementById('ctaSuccess');
-    success.innerHTML = '✓ Check your inbox to confirm your spot on the waitlist.';
+    if (data.existing) {
+      success.innerHTML = '✓ You\'re already on the list! We\'ll be in touch soon.';
+    } else {
+      success.innerHTML = '✓ You\'re on the list. We\'ll be in touch soon.';
+    }
     success.style.display = 'block';
-
-    // Increment local count display
-
-
-
   } catch (err) {
-    // Network error — still show success since the form may have worked
-    console.warn('Buttondown request error:', err);
-    document.getElementById('ctaForm').style.display = 'none';
-    const success = document.getElementById('ctaSuccess');
-    success.innerHTML = '✓ Check your inbox to confirm your spot on the waitlist.';
-    success.style.display = 'block';
+    console.warn('Waitlist signup error:', err);
+    btn.textContent = 'Join Waitlist';
+    btn.disabled = false;
+    input.style.borderColor = 'var(--red)';
+    input.placeholder = 'Something went wrong — try again';
   }
 }
 
@@ -1056,20 +1047,17 @@ async function submitWaitlist2() {
   if (!email || !email.includes('@') || !email.includes('.')) return;
 
   try {
-    const formData = new FormData();
-    formData.append('email', email);
-    formData.append('embed', '1');
-
-    await fetch(BUTTONDOWN_EMBED, {
+    await fetch(WAITLIST_API, {
       method: 'POST',
-      body: formData,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
     });
   } catch (err) {
-    console.warn('Buttondown request error:', err);
+    console.warn('Waitlist signup error:', err);
   }
 
   input.value = '';
-  input.placeholder = '✓ Check your inbox to confirm!';
+  input.placeholder = '✓ You\'re on the list!';
   input.disabled = true;
 }
 
