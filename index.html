@@ -738,9 +738,7 @@ footer .right a:hover { color: var(--text-secondary); }
         <div class="cta-success" id="ctaSuccess">
           ✓ You're on the list. We'll be in touch soon.
         </div>
-        <div class="cta-count">
-          <span id="waitlistCount">127</span> people already on the waitlist
-        </div>
+
       </div>
 
       <div class="qr-card">
@@ -1039,8 +1037,8 @@ async function submitWaitlist() {
     success.style.display = 'block';
 
     // Increment local count display
-    const count = document.getElementById('waitlistCount');
-    count.textContent = parseInt(count.textContent) + 1;
+
+
 
   } catch (err) {
     // Network error — still show success since the form may have worked
